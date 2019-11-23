@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/sns-project-infra
   docker:
-    - image: jyepesr1/terraform:0.12.6
+    - image: jyepesr1/terraform:0.12.16
   environment:
     TF_IN_AUTOMATION: true
 
