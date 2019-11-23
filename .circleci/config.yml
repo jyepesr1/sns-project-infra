@@ -1,0 +1,64 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/sns-project-infra
+  docker:
+    - image: jyepesr1/terraform:0.12.6
+  environment:
+    TF_IN_AUTOMATION: true
+
+jobs:
+  init:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: init
+          command: terraform init -input=false
+      - persist_to_workspace:
+          root: ~/sns-project-infra
+          paths: .
+  plan:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/sns-project-infra
+      - run:
+          name: plan
+          command: terraform plan -no-color -out=tfplan -input=false
+      - store_artifacts:
+          path: ~/infra/tfplan
+          destination: tfplan
+      - persist_to_workspace:
+          root: ~/sns-project-infra
+          paths: .
+  apply:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/sns-project-infra
+      - run:
+          name: apply
+          command: terraform apply -input=false -auto-approve tfplan
+      - run:
+          name: show
+          command: terraform show -no-color > tfresult
+      - store_artifacts:
+          path: ~/infra/tfresult
+          destination: tfresult
+
+workflows:
+  version: 2
+  build_deploy:
+    jobs:
+      - init
+      - plan:
+          requires:
+            - init
+      - apply:
+          requires:
+            - plan
+          filters:
+            branches:
+              only: 
+                - master
