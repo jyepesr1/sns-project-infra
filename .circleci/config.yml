@@ -24,7 +24,8 @@ jobs:
   plan:
     <<: *defaults
     steps:
-      - aws-cli/setup
+      - aws-cli/setup:
+          profile-name: default
       - attach_workspace:
           at: ~/sns-project-infra
       - run:
