@@ -18,15 +18,8 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-data "template_file" "template_bastion" {
-  template = <<-EOF
-              #!/bin/bash
-              yum install -y git python-pip
-              amazon-linux-extras install ansible2
-              mkdir /usr/ansible
-              git clone -b ec2 https://github.com/jyepesr1/ansible_movie_analyst_app /usr/ansible/
-              pip install awscli PyMySQL --upgrade --user
-              cd /usr/ansible
-              ansible-playbook -v --vault-id @get_pass.sh --connection=local -i 127.0.0.1, ./playbooks/bastion.yml
-  EOF
+variable "app_port" {
+  description = "Port which the application will run"
+  default = "80"
 }
+

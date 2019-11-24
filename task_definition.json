@@ -1,0 +1,26 @@
+[
+  {
+    "name": "sns-project",
+    "image": "${image}:latest",
+    "portMappings": [
+      {
+        "containerPort": ${app_port},
+        "hostPort": ${app_port}
+      }
+    ],
+    "memory": 300,
+    "networkMode": "awsvpc",
+    "environment": [
+      {
+        "name": "APP_PORT",
+        "value": "${app_port}"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "ARN_SNS",
+        "valueFrom": "${arn_ssm_parameter}"
+      }
+    ]
+  }
+]

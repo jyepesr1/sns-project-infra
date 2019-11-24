@@ -28,7 +28,7 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_subnet" "public_1" {
   availability_zone       = "us-east-1a"
-  cidr_block              = "172.31.0.0/20"
+  cidr_block              = "172.31.0.0/24"
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.main_vpc.id
 
@@ -38,9 +38,21 @@ resource "aws_subnet" "public_1" {
   }
 }
 
+resource "aws_subnet" "public_2" {
+  availability_zone       = "us-east-1b"
+  cidr_block              = "172.31.1.0/24"
+  map_public_ip_on_launch = true
+  vpc_id                  = aws_vpc.main_vpc.id
+
+  tags = {
+    Name = "Public-2"
+    Zone = "Public"
+  }
+}
+
 resource "aws_subnet" "private_1" {
   availability_zone       = "us-east-1a"
-  cidr_block              = "172.31.16.0/20"
+  cidr_block              = "172.31.2.0/24"
   vpc_id                  = aws_vpc.main_vpc.id
   map_public_ip_on_launch = false
 
@@ -59,8 +71,13 @@ resource "aws_route_table" "rtb_public" {
   }
 }
 
-resource "aws_route_table_association" "rta_subnet_public" {
+resource "aws_route_table_association" "rta_subnet_public-1" {
   subnet_id      = aws_subnet.public_1.id
+  route_table_id = aws_route_table.rtb_public.id
+}
+
+resource "aws_route_table_association" "rta_subnet_public-2" {
+  subnet_id      = aws_subnet.public_2.id
   route_table_id = aws_route_table.rtb_public.id
 }
 
