@@ -69,58 +69,7 @@ data "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-
 resource "aws_iam_role_policy_attachment" "policy-attach-2" {
   role       = aws_iam_role.ecs_role.name
   policy_arn = data.aws_iam_policy.AmazonECSTaskExecutionRolePolicy.arn
-}
-
-
-resource "aws_iam_role" "ecs_autoscale_role" {
-  name = "ecs_autoscale_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "application-autoscaling.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-data "aws_iam_policy_document" "autoscale_policy_doc" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ecs:DescribeServices",
-      "ecs:UpdateService"
-    ]
-    resources = [ "*" ]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [ "cloudwatch:DescribeAlarms" ]
-    resources = [ "*" ]
-  }
-
-}
-
-resource "aws_iam_policy" "ecs_autoscale_policy" {
-  name        = "autoscale_cloudwatch"
-  description = "Read CloudWatch Metrics for autoscaling"
-
-  policy = data.aws_iam_policy_document.autoscale_policy_doc.json
-}
-
-resource "aws_iam_role_policy_attachment" "policy-attach-autoscale" {
-  role       = aws_iam_role.ecs_autoscale_role.name
-  policy_arn = aws_iam_policy.ecs_autoscale_policy.arn
 }
